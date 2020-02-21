@@ -12,12 +12,11 @@ import time
 import json
 import io
 import os
-from ocr import convertImage2Text
 import base64
 import cv2
 import pytesseract
 import argparse
-from flask import Flask
+from flask import request
 from flask_cors import CORS, cross_origin
 
 # initialize our Flask application and Redis server
@@ -52,31 +51,24 @@ def predict():
 	# ensure an image was properly uploaded to our endpoint
 	if flask.request.method == "POST":
 		print("Start convert ...")
+		json = request.get_json()
+		images = json.get('image')
+		#imgstring = request.form.get('image')
+		imgdata = base64.b64decode(images)
+		image = Image.open(io.BytesIO(imgdata))
+		print(image)
+		#gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+		#gray = cv2.threshold(gray, 0, 255,
+		#					 cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+		text = pytesseract.image_to_string(image, lang='vie')
 
-		if flask.request.files.get("image"):
-			print('vao')
-			# read the image in PIL format and prepare it for
-			# classification
-			image = flask.request.files["image"].read()
-			print(image)
-			image = Image.open(io.BytesIO(image))
-			# image = prepare_image(image,
-			# 	(settings.IMAGE_WIDTH, settings.IMAGE_HEIGHT))
+		# enc = base64.b64encode(text)
+		# print(enc)
+		#print(text)
+		data["text"] = text
 
-			# ensure our NumPy array is C-contiguous as well,
-			# otherwise we won't be able to serialize it
-			#image = image.copy(order="C")
-
-
-
-			# Load ảnh và apply nhận dạng bằng Tesseract OCR
-			text = pytesseract.image_to_string(image, lang='vie')
-			print(text)
-
-			data["text"] = text
-			# indicate that the request was a success
-			data["success"] = True
-
+		# indicate that the request was a success
+		data["success"] = True
 	# return the data dictionary as a JSON response
 	return flask.jsonify(data)
 

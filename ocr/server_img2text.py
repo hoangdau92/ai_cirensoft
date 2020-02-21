@@ -3,16 +3,18 @@ from keras.preprocessing.image import img_to_array
 from keras.applications import imagenet_utils
 from PIL import Image
 import numpy as np
+import settings
+import helpers
 import flask
 import io
 import os
-from ocr import convertImage2Text
 import base64
-import cv2
 import pytesseract
-import argparse
 from flask import request
 from flask_cors import CORS, cross_origin
+from bodautiengviet import convert
+import re
+from normalize import normalize
 
 # initialize our Flask application and Redis server
 app = flask.Flask(__name__)
@@ -48,25 +50,26 @@ def predict():
     # ensure an image was properly uploaded to our endpoint
     if flask.request.method == "POST":
         print("Start convert ...")
-
-        # imgstring = request.form.get('image')
         json = request.get_json()
         images = json.get('image')
-
-        # Convert multiples images
-        # text = "\n"
-        # for i in images:
-        #     img_data = base64.urlsafe_b64decode(i)
-        #     image = Image.open(io.BytesIO(img_data))
-        #     text = pytesseract.image_to_string(image, lang='vie') + text
-
-        img_data = base64.urlsafe_b64decode(images)
-        image = Image.open(io.BytesIO(img_data))
+        # imgstring = request.form.get('image')
+        imgdata = base64.b64decode(images)
+        image = Image.open(io.BytesIO(imgdata))
+        # print(image)
+        # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # gray = cv2.threshold(gray, 0, 255,
+        # cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+        image = np.asarray(image)
+        image = normalize(image)
         text = pytesseract.image_to_string(image, lang='vie')
 
-        print(text)
-        # Response
+        # enc = base64.b64encode(text)
+        # print(enc)
+        # print(text)
+        # text = re.sub('[^A-Za-z0-9]+', '', text)
+        # text = convert(text)
         data["text"] = text
+
         # indicate that the request was a success
         data["success"] = True
     # return the data dictionary as a JSON response
