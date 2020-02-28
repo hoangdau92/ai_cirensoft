@@ -79,7 +79,9 @@ def predict():
 # for debugging purposes, it's helpful to start the Flask testing
 # server (don't use this for production
 if __name__ == "__main__":
-    PORT = os.getenv("PORT", 6790)
-    HOST = os.getenv("HOST", "10.151.137.221")
+    # PORT = os.getenv("PORT", 6790)
+    # HOST = os.getenv("HOST", "10.151.137.221")
+    PORT = os.getenv("PORT", 8081)
+    HOST = os.getenv("HOST", "10.1.15.158")
     print("* Starting web service at http://{host}:{port}...".format(host=HOST, port=PORT))
     app.run(host=HOST, port=PORT)
