@@ -17,3 +17,6 @@ IMAGE_QUEUE = "image_queue"
 BATCH_SIZE = 32
 SERVER_SLEEP = 0.25
 CLIENT_SLEEP = 0.25
+
+
+test = 1
